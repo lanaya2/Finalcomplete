@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NoteNest</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="wrap">
+
+    <!-- Top logout button -->
+    <p style="text-align:right; margin-top:8px;">
+      <a id="logoutLink" class="btn dark" href="#">Logout</a>
+    </p>
+
+    <!-- ===== Landing ===== -->
+    <section id="landing" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h1 class="center">Empowering education through interactive learning and assessment</h1>
+      <p class="center muted">Choose a portal to continue</p>
+      <div class="grid2">
+        <div class="box">
+          <h2>Student Portal</h2>
+          <p class="muted">Access quizzes, upload documents, and track your progress.</p>
+          <div class="box"><span class="dot green"></span> Take interactive quizzes</div>
+          <div class="box"><span class="dot blue"></span> Upload study materials</div>
+          <div class="box"><span class="dot blue"></span> View your grades and comments</div>
+          <p><button id="goStudent" class="btn" type="button">Go to Student Dashboard</button></p>
+        </div>
+        <div class="box">
+          <h2>Teacher Portal</h2>
+          <p class="muted">Manage students and track class performance.</p>
+          <div class="box"><span class="dot purple"></span> View student quiz results</div>
+          <div class="box"><span class="dot orange"></span> Comment on student progress</div>
+          <p><button id="goTeacher" class="btn dark" type="button">Go to Teacher Dashboard</button></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Student Dashboard ===== -->
+    <section id="student" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2 class="center">Student Dashboard</h2>
+      <p class="center muted">What would you like to do?</p>
+
+      <div class="grid2">
+        <div class="box">
+          <h3>Take a Quiz</h3>
+          <p class="muted">Test your knowledge with instant feedback.</p>
+          <p><button id="goQuiz" class="btn" type="button">Start Taking Quiz</button></p>
+        </div>
+
+        <div class="box">
+          <h3>Upload Or View Chapter or Document</h3>
+          <p class="muted">Share notes, assignments, or images.</p>
+          <div class="box">📄 PDF Documents</div>
+          <p>
+            <button id="goPdfs" class="btn" type="button">Upload / View PDFs</button>
+          </p>
+        </div>
+      </div>
+
+      <div class="box" style="margin-top:16px;">
+        <h3>Teacher Comments</h3>
+        <div id="studentCommentsList" class="muted">
+          No comments yet.
+        </div>
+      </div>
+
+      <p style="margin-top:8px">
+        <button id="backFromStudent" class="btn" type="button">Back to Home</button>
+      </p>
+    </section>
+
+    <!-- ===== Student PDFs (viewer) ===== -->
+    <section id="pdfs" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2 class="center">My PDF Library</h2>
+      <p class="center muted">Upload PDFs and preview them in your browser. Files stay on your device.</p>
+
+      <div class="box">
+        <label for="pdfInput"><strong>Select PDF files</strong></label>
+        <input id="pdfInput" type="file" accept="application/pdf" multiple>
+      </div>
+
+      <div id="pdfList" class="grid2"></div>
+
+      <div id="pdfViewer" class="box" style="margin-top:16px; height:70vh">
+        <iframe id="pdfFrame" title="PDF viewer" style="width:100%; height:100%; border:0"></iframe>
+      </div>
+
+      <p style="margin-top:8px">
+        <button id="backFromPdfs" class="btn" type="button">Back to Student Dashboard</button>
+      </p>
+    </section>
+
+    <!-- ===== Quiz ===== -->
+    <section id="quiz" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2>Quiz</h2>
+      <p class="muted">10 random questions from the question bank.</p>
+
+      <p id="quizQuestionText"><em>Loading question...</em></p>
+      <div id="quizChoices"></div>
+
+      <p style="margin-top:12px;">
+        <button id="quizPrevBtn" type="button" class="btn">Previous</button>
+        <button id="quizNextBtn" type="button" class="btn">Next</button>
+        <!-- Enabled only on Q10 & after all answered (in JS) -->
+        <button id="quizFinishBtn" type="button" class="btn dark">Finish</button>
+      </p>
+      <!-- No student dashboard button here, only after results -->
+    </section>
+
+    <!-- ===== Results ===== -->
+    <section id="results" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2>Quiz Results</h2>
+      <div id="resultsSummary" class="box">
+        <p class="muted">Finish a quiz to see your results here.</p>
+      </div>
+
+      <p style="margin-top:8px">
+        <button id="resultsBackStudent" class="btn" type="button">
+          Back to Student Dashboard
+        </button>
+        <button id="resultsRetake" class="btn dark" type="button">
+          Retake Quiz
+        </button>
+      </p>
+    </section>
+
+    <!-- ===== Teacher Dashboard ===== -->
+    <section id="teacher" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2 class="center">Teacher Dashboard</h2>
+      <p class="center muted">Manage students and track progress</p>
+
+      <div class="row">
+        <!-- Left: list of students + progress -->
+        <div class="col">
+          <div class="box">
+            <h3>Students &amp; Progress</h3>
+            <p class="muted">Each student is listed by their email prefix (before @twu.edu).</p>
+            <div id="teacherStudentList" class="muted">
+              No student records yet.
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: comment + stats for selected student -->
+        <div class="col">
+          <div class="box">
+            <h3>Teacher Comment for Selected Student</h3>
+            <p class="muted">
+              Selected student:
+              <span id="selectedStudentLabel" class="muted">None</span>
+            </p>
+            <div id="selectedStudentStats" class="muted" style="margin-bottom:8px;"></div>
+            <textarea id="teacherCommentInput" rows="3" style="width:100%;"></textarea>
+            <p style="margin-top:8px;">
+              <button id="saveTeacherComment" class="btn" type="button">Save Comment</button>
+            </p>
+            <div id="teacherCommentStatus" class="muted" style="margin-top:4px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-top:8px">
+        <button id="backFromTeacher" class="btn dark" type="button">Back to Home</button>
+      </p>
+    </section>
+
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
