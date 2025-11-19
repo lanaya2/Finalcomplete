@@ -1,0 +1,11 @@
+<h2>Admin Dashboard</h2>
+<p>Welcome, Admin!</p>
+
+<script type="module">
+    
+
+import { logoutUser } from "../../auth.js";
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  logoutUser();
+});

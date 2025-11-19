@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NoteNest</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* tiny safety styles if styles.css is empty */
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#fff;color:#111}
+    .wrap{max-width:980px;margin:0 auto;padding:24px}
+    .section{display:none}
+    .center{text-align:center}
+    .muted{color:#666;font-size:.95rem}
+    .btn{display:inline-block;background:#4f46e5;color:#fff;border:0;border-radius:8px;padding:8px 14px;text-decoration:none;cursor:pointer}
+    .btn.dark{background:#111;color:#fff}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    .box{border:1px solid #e5e7eb;border-radius:10px;padding:10px;background:#fff}
+    .progress{height:8px;background:#eee;border-radius:6px;overflow:hidden}
+    .progress span{display:block;height:100%;background:#4f46e5}
+    .error{color:#b91c1c}
+    .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+    .dot.green{background:#22c55e}.dot.blue{background:#3b82f6}.dot.purple{background:#8b5cf6}.dot.orange{background:#f59e0b}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- ===== Login Page ===== -->
+    <section id="login" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2>Login</h2>
+      <p class="muted">Please sign in with your TWU email.</p>
+      <form action="#landing" method="get" class="box" novalidate>
+        <label for="email"><strong>Email</strong></label>
+        <input id="email" name="email" type="email" required
+               placeholder="your.name@twu.edu"
+               pattern="^[^@\\s]+@([a-zA-Z0-9-]+\\.)*twu\\.edu$" />
+        <button type="submit" class="btn">Continue</button>
+      </form>
+    </section>
+
+    <!-- ===== Landing ===== -->
+    <section id="landing" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h1 class="center">Empowering education through interactive learning and assessment</h1>
+      <p class="center muted">Choose a portal to continue</p>
+      <div class="grid2">
+        <div class="box">
+          <h2>Student Portal</h2>
+          <p class="muted">Access quizzes, upload documents, and track your progress.</p>
+          <div class="box"><span class="dot green"></span> Take interactive quizzes</div>
+          <div class="box"><span class="dot blue"></span> Upload study materials</div>
+          <div class="box"><span class="dot blue"></span> View your grades and progress</div>
+          <p><a class="btn" href="#student">Go to Student Dashboard</a></p>
+        </div>
+        <div class="box">
+          <h2>Teacher Portal</h2>
+          <p class="muted">Manage students, create quizzes, and track class performance.</p>
+          <div class="box"><span class="dot purple"></span> View all student grades</div>
+          <div class="box"><span class="dot orange"></span> Comment on student progress</div>
+          <div class="box"><span class="dot green"></span> Manage class analytics</div>
+          <p><a class="btn dark" href="#teacher">Go to Teacher Dashboard</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Student Dashboard ===== -->
+    <section id="student" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2 class="center">Student Dashboard</h2>
+      <p class="center muted">What would you like to do?</p>
+
+      <div class="grid2">
+        <div class="box">
+          <h3>Take a Quiz</h3>
+          <p class="muted">Test your knowledge with instant feedback.</p>
+          <div class="box" style="display:flex; justify-content:space-between"><strong>quiz-1</strong> <span class="muted">10 questions</span></div>
+          <p>
+            <a class="btn" href="#quiz">Start Taking Quiz</a>
+            <a class="btn" href="#student-comments">View Teacher Comments</a>
+          </p>
+        </div>
+
+        <div class="box">
+          <h3>Upload Or View Chapter or Document</h3>
+          <p class="muted">Share notes, assignments, or images.</p>
+          <div class="box">📄 PDF Documents</div>
+          <p>
+            <a class="btn" href="#pdfs">Upload</a>
+            <a class="btn" href="#pdfs">View PDFs</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Student Comments ===== -->
+    <section id="student-comments" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2 class="center">Teacher Comments</h2>
+      <p class="center muted">Feedback left by your instructors.</p>
+      <div class="box">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>Course: Software Engineering</strong>
+          <span class="muted">Teacher: Dr. Jian Zhang • Last week</span>
+        </div>
+        <p>Good Job.</p>
+      </div>
+      <p style="margin-top:8px">
+        <a class="btn" href="#student">Back to Student Dashboard</a>
+      </p>
+    </section>
+
+    <!-- ===== Student PDFs ===== -->
+    <section id="pdfs" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2 class="center">My PDF Library</h2>
+      <p class="center muted">Upload PDFs and preview them in your browser. Files stay saved on your device.</p>
+
+      <div class="box">
+        <label for="pdfInput"><strong>Select PDF files</strong></label>
+        <input id="pdfInput" type="file" accept="application/pdf" multiple>
+      </div>
+
+      <div id="pdfList" class="grid2"></div>
+
+      <div id="pdfViewer" class="box" style="margin-top:16px; height:70vh">
+        <iframe id="pdfFrame" title="PDF viewer" style="width:100%; height:100%; border:0"></iframe>
+      </div>
+
+      <p style="margin-top:8px">
+        <a class="btn" href="#student">Go to Student Dashboard</a>
+      </p>
+    </section>
+
+    <!-- ===== Quiz ===== -->
+    <section id="quiz" class="section">
+      <!-- Content is injected by JS -->
+    </section>
+
+    <!-- ===== Results ===== -->
+    <section id="results" class="section">
+      <!-- Content is injected by JS -->
+    </section>
+
+    <!-- ===== Teacher Dashboard ===== -->
+    <section id="teacher" class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2 class="center">Teacher Dashboard</h2>
+      <p class="center muted">Manage students and track progress</p>
+
+      <div class="grid2">
+        <div class="box"><strong>Total Students:</strong> 4</div>
+        <div class="box"><strong>Class Average:</strong> 81%</div>
+        <div class="box"><strong>Quizzes Completed:</strong> 0</div>
+        <div class="box"><strong>Active Today:</strong> 0</div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+/* ========= Helpers ========= */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+const Storage = {
+  get(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+    catch { return fallback; }
+  },
+  set(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+};
+
+const Sections = {
+  allIds: ["login","landing","student","student-comments","pdfs","quiz","results","teacher"],
+  show(id) {
+    this.allIds.forEach(secId => {
+      const el = document.getElementById(secId);
+      if (!el) return;
+      el.style.display = (secId === id) ? "block" : "none";
+    });
+  }
+};
+
+/* ================ MODELS ================= */
+
+class AuthModel {
+  constructor() {
+    const saved = Storage.get("notenest.auth", { email: null, isAuthenticated: false });
+    this.email = saved.email;
+    this.isAuthenticated = saved.isAuthenticated;
+    this.twuRegex = /^[^@\s]+@([a-zA-Z0-9-]+\.)*twu\.edu$/i;
+  }
+  login(email) {
+    if (!this.twuRegex.test(email)) return { ok: false, message: "Please use your TWU email." };
+    this.email = email;
+    this.isAuthenticated = true;
+    Storage.set("notenest.auth", { email: this.email, isAuthenticated: this.isAuthenticated });
+    return { ok: true };
+  }
+  logout() {
+    this.email = null;
+    this.isAuthenticated = false;
+    Storage.set("notenest.auth", { email: this.email, isAuthenticated: this.isAuthenticated });
+  }
+}
+
+class QuizModel {
+  constructor() {
+    this.bank = [];           // {text, options:["True","False"], correctIndex, points}
+    this.index = 0;
+    this.answers = [];        // chosen option index per question
+    this.startedAt = null;
+    this.finishedAt = null;
+  }
+
+  async loadFromFiles(qPath = "TestBank.txt", aPath = "Answers.txt") {
+    const fetchText = async (path) => {
+      const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Couldn't load ${path} (${res.status})`);
+      return res.text();
+    };
+    const [qText, aText] = await Promise.all([fetchText(qPath), fetchText(aPath)]);
+
+    const lines = s => s.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n")
+      .split("\n").map(x => x.trim()).filter(Boolean);
+
+    const qs = lines(qText);
+    const asRaw = lines(aText);
+    const as = asRaw.map(x => x.toUpperCase());
+
+    const invalid = as.find(x => x !== "TRUE" && x !== "FALSE");
+    if (invalid) throw new Error(`Answers.txt has invalid value "${invalid}". Use TRUE or FALSE.`);
+    if (qs.length !== as.length) {
+      throw new Error(`Line count mismatch: ${qs.length} questions vs ${as.length} answers.`);
+    }
+
+    // Fisher–Yates shuffle indices, take first 10
+    const idxs = [...qs.keys()];
+    for (let i = idxs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+    }
+    const picked = idxs.slice(0, Math.min(10, idxs.length));
+
+    this.bank = picked.map(i => ({
+      text: qs[i],
+      options: ["True", "False"],
+      correctIndex: (as[i] === "TRUE" ? 0 : 1),
+      points: 1
+    }));
+  }
+
+  start() {
+    this.index = 0;
+    this.answers = Array(this.bank.length).fill(null);
+    this.startedAt = Date.now();
+    this.finishedAt = null;
+  }
+  current() { return { index: this.index, q: this.bank[this.index] }; }
+  select(optIdx) { this.answers[this.index] = optIdx; }
+  next() { if (this.index < this.bank.length - 1) this.index++; }
+  prev() { if (this.index > 0) this.index--; }
+  isComplete() { return this.answers.every(a => a !== null); }
+  finish() { this.finishedAt = Date.now(); }
+
+  summary() {
+    const earned = this.answers.reduce((s,a,i)=> s + (a === this.bank[i].correctIndex ? this.bank[i].points : 0), 0);
+    const total = this.bank.reduce((s,q)=> s + q.points, 0);
+    const correct = this.answers.filter((a,i)=> a === this.bank[i].correctIndex).length;
+    const incorrect = this.bank.length - correct;
+    const percent = total ? Math.round((earned/total)*100) : 0;
+    const minutes = Math.max(1, Math.round(((this.finishedAt ?? Date.now()) - (this.startedAt ?? Date.now()))/60000));
+    return { earned, total, correct, incorrect, percent, minutes, answers: [...this.answers] };
+  }
+}
+
+/* ====== PDFs (PERSISTENT) ====== */
+class PDFLibraryModel {
+  constructor() { 
+    this.key = "notenest.pdfs";
+    this.files = Storage.get(this.key, []); // [{id,name,dataUrl}]
+  }
+  _save() { Storage.set(this.key, this.files); }
+  addFile(name, dataUrl) {
+    const id = Date.now() + "-" + Math.random().toString(36).slice(2,7);
+    this.files.push({ id, name, dataUrl });
+    this._save();
+  }
+  remove(id) {
+    this.files = this.files.filter(f => f.id !== id);
+    this._save();
+  }
+  list() { return [...this.files]; }
+}
+
+class ResultsModel {
+  constructor() {
+    this.key = "notenest.results";
+    this.history = Storage.get(this.key, []); // [{ts, earned, total, percent, ...}]
+  }
+  save(summary) {
+    const entry = { ts: Date.now(), ...summary };
+    this.history.push(entry);
+    Storage.set(this.key, this.history);
+  }
+  all() { return [...this.history]; }
+}
+
+class DashboardModel {
+  constructor(resultsModel) { this.resultsModel = resultsModel; }
+  stats() {
+    const list = this.resultsModel.all();
+    const quizzesCompleted = list.length;
+    const avg = quizzesCompleted ? Math.round(list.reduce((s,r)=> s + r.percent, 0) / quizzesCompleted) : 0;
+    return { quizzesCompleted, classAverage: avg, totalStudents: 4, activeToday: Math.min(2, quizzesCompleted) };
+  }
+}
+
+/* ============== CONTROLLERS & VIEWS ============== */
+
+class AuthController {
+  constructor(authModel, navigationController) {
+    this.authModel = authModel; this.navigation = navigationController;
+  }
+  bindLoginForm() {
+    const form = $("#login form"); if (!form) return;
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = $("#email").value.trim();
+      const res = this.authModel.login(email);
+      $(".help")?.remove();
+      const help = document.createElement("div");
+      help.className = "help"; help.style.marginTop = "6px";
+      form.appendChild(help);
+      if (!res.ok) { help.textContent = res.message; return; }
+      help.textContent = "Signed in.";
+      location.hash = "#landing";
+      this.navigation.route();
+    });
+  }
+}
+
+class DashboardController {
+  constructor(dashboardModel) { this.dashboardModel = dashboardModel; }
+  updateTeacherDashboard() {
+    const s = this.dashboardModel.stats();
+    const boxes = $$("#teacher .grid2 .box");
+    if (boxes[0]) boxes[0].innerHTML = `<strong>Total Students:</strong> ${s.totalStudents}`;
+    if (boxes[1]) boxes[1].innerHTML = `<strong>Class Average:</strong> ${s.classAverage}%`;
+    if (boxes[2]) boxes[2].innerHTML = `<strong>Quizzes Completed:</strong> ${s.quizzesCompleted}`;
+    if (boxes[3]) boxes[3].innerHTML = `<strong>Active Today:</strong> ${s.activeToday}`;
+  }
+}
+
+class QuizView {
+  renderQuestion({ index, total, question, selected, onSelect, onNext, onPrev }) {
+    const sec = $("#quiz"); if (!sec) return;
+    const warning = `<div id="warn" class="muted" style="color:#b91c1c;display:none;margin-bottom:8px">Please select an answer before continuing.</div>`;
+    sec.innerHTML = `
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2>Quiz: True / False</h2>
+      <p class="muted">Question ${index + 1}/${total}</p>
+      <div class="progress" style="margin:10px 0 16px"><span style="width:${Math.round(((index+1)/total)*100)}%"></span></div>
+      ${warning}
+      <p><strong>${question.text}</strong></p>
+      <div id="options"></div>
+      <p style="display:flex; gap:8px; flex-wrap:wrap">
+        <button class="btn" id="nextBtn">${index === total - 1 ? "Finish" : "Next"}</button>
+        <button class="btn" id="prevBtn" style="background:#fff; color:#222; border:1px solid #e3e3e3">Previous</button>
+        <a class="btn" href="#student">Go to Student Dashboard</a>
+      </p>
+      <p class="muted">Your answer is saved automatically.</p>
+    `;
+    const opts = $("#options", sec);
+    question.options.forEach((opt, i) => {
+      const div = document.createElement("div");
+      div.className = "box"; div.style.cursor = "pointer";
+      const isSel = selected === i;
+      div.innerHTML = `${isSel ? "✅" : "◻️"} ${opt}`;
+      if (isSel) { div.style.borderColor = "#4f46e5"; div.style.boxShadow = "0 0 0 2px rgba(79,70,229,0.1)"; }
+      div.addEventListener("click", () => { $("#warn")?.style && ($("#warn").style.display="none"); onSelect(i); });
+      opts.appendChild(div);
+    });
+    $("#nextBtn", sec).addEventListener("click", () => onNext());
+    $("#prevBtn", sec).addEventListener("click", () => onPrev());
+  }
+}
+
+class ResultsView {
+  render(summary, onRetake) {
+    const sec = $("#results"); if (!sec) return;
+    const grade = p => p>=90?"A":p>=80?"B":p>=70?"C":p>=60?"D":"F";
+    const rows = (window.App?.quizModel?.bank || []).map((q,i) => {
+      const chosen = q.options[summary.answers[i] ?? -1] ?? "—";
+      const correct = q.options[q.correctIndex];
+      const got = summary.answers[i] === q.correctIndex;
+      const pts = got ? `+${q.points}` : `-${q.points}`;
+      return `
+        <div class="box" style="display:flex; justify-content:space-between">
+          <span>${i+1}) ${q.text}</span>
+          <strong>${got ? "✅" : "❌"} ${pts} (You: ${chosen} • Ans: ${correct})</strong>
+        </div>`;
+    }).join("");
+
+    sec.innerHTML = `
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2>🎓 Quiz Results</h2>
+      <div class="grid2">
+        <div class="box">
+          <p class="muted">Final Grade</p>
+          <div style="display:flex; align-items:center; gap:16px">
+            <div class="box" style="width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold">${grade(summary.percent)}</div>
+            <div>
+              <strong>${summary.earned}/${summary.total} Points</strong>
+              <span class="muted">(${summary.percent}% Score)</span>
+              <div class="muted">${summary.percent >= 70 ? "Passed" : "Not Passed"}</div>
+            </div>
+          </div>
+        </div>
+        <div class="box">
+          <p class="muted">Performance Breakdown</p>
+          <p>✅ ${summary.correct} Correct</p>
+          <p>❌ ${summary.incorrect} Incorrect</p>
+          <p>⏱️ ${summary.minutes} minutes</p>
+        </div>
+      </div>
+
+      <div class="box">
+        <p class="muted">Question-by-Question Breakdown</p>
+        ${rows}
+        <div style="text-align:right"><strong>Total Score: ${summary.earned}/${summary.total}</strong></div>
+      </div>
+
+      <p>
+        <a class="btn" id="retakeBtn">Retake Quiz</a>
+        <a class="btn" href="#student">Continue Course</a>
+      </p>
+    `;
+    $("#retakeBtn", sec)?.addEventListener("click", () => onRetake && onRetake());
+  }
+}
+
+class QuizController {
+  constructor(quizModel, resultsModel, quizView, resultsView) {
+    this.quizModel = quizModel;
+    this.resultsModel = resultsModel;
+    this.quizView = quizView;
+    this.resultsView = resultsView;
+    this.bound = false;
+  }
+
+  async startNewQuiz() {
+    const qsec = document.getElementById("quiz");
+    if (qsec) qsec.innerHTML = `<h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1><p class="muted">Loading quiz…</p>`;
+    try {
+      await this.quizModel.loadFromFiles("TestBank.txt", "Answers.txt");
+      this.quizModel.start();
+      this.render();
+    } catch (err) {
+      const msg = (err && err.message) ? err.message : "Unknown error";
+      if (qsec) {
+        qsec.innerHTML = `
+          <h2>Quiz couldn’t load</h2>
+          <div class="box error">${msg}</div>
+          <p class="muted">
+            Make sure <strong>TestBank.txt</strong> and <strong>Answers.txt</strong> are
+            in the same folder as this HTML, and you're running a local server (Live Server).
+          </p>
+          <p><a class="btn" href="#student">Back to Student Dashboard</a></p>
+        `;
+      }
+      console.error(err);
+    }
+  }
+
+  render() {
+    const { index, q } = this.quizModel.current();
+    this.quizView.renderQuestion({
+      index,
+      total: this.quizModel.bank.length,
+      question: q,
+      selected: this.quizModel.answers[index],
+      onSelect: (optIdx) => { this.quizModel.select(optIdx); this.render(); },
+      onNext: () => {
+        if (this.quizModel.answers[index] === null) { const w=$("#warn"); if (w) w.style.display="block"; return; }
+        if (index === this.quizModel.bank.length - 1) {
+          if (!this.quizModel.isComplete()) { const w=$("#warn"); if (w){ w.textContent="Please answer every question before finishing."; w.style.display="block"; } return; }
+          this.quizModel.finish();
+          const summary = this.quizModel.summary();
+          this.resultsModel.save(summary);
+          this.resultsView.render(summary, () => {
+            this.quizModel.start();
+            this.render();
+            location.hash = "#quiz";
+          });
+          location.hash = "#results";
+        } else {
+          this.quizModel.next();
+          this.render();
+        }
+      },
+      onPrev: () => { this.quizModel.prev(); this.render(); }
+    });
+  }
+
+  wireRoute() {
+    if (this.bound) return;
+    window.addEventListener("hashchange", async () => {
+      if (location.hash === "#quiz") {
+        await this.startNewQuiz();
+      }
+      if (location.hash === "#results") {
+        this.resultsView.render(this.quizModel.summary(), () => {
+          this.quizModel.start(); this.render(); location.hash = "#quiz";
+        });
+      }
+    });
+    this.bound = true;
+  }
+}
+
+class NavigationController {
+  constructor(authModel) { this.authModel = authModel; }
+  route() {
+    const hash = location.hash || "#login";
+    const needAuth = (hash !== "#login");
+    if (needAuth && !this.authModel.isAuthenticated) {
+      Sections.show("login"); location.hash = "#login"; return;
+    }
+    switch (hash) {
+      case "#login": Sections.show("login"); break;
+      case "#landing": Sections.show("landing"); break;
+      case "#student": Sections.show("student"); break;
+      case "#student-comments": Sections.show("student-comments"); break;
+      case "#pdfs": Sections.show("pdfs"); setupPDFs(window.App.pdfModel); break;
+      case "#quiz": Sections.show("quiz"); break;
+      case "#results": Sections.show("results"); break;
+      case "#teacher": Sections.show("teacher"); window.App.dashboardController.updateTeacherDashboard(); break;
+      default: Sections.show("landing");
+    }
+  }
+}
+
+/* ====== PDFs setup (robust binding + preview, PERSISTENT) ====== */
+function setupPDFs(pdfModel){
+  const input = $("#pdfInput");
+  const list  = $("#pdfList");
+  const frame = $("#pdfFrame");
+  if (!input || !list || !frame) return;
+
+  // Build UI from saved files
+  renderList();
+
+  // Clicking a saved item shows it in the iframe
+  list.addEventListener("click", (e) => {
+    const card = e.target.closest("[data-url]");
+    if (!card) return;
+    frame.src = card.dataset.url + "#view=FitH";
+  }, { once:false });
+
+  // Selecting new PDFs -> read & save persistently
+  input.addEventListener("change", async () => {
+    const files = [...input.files];
+    if (!files.length) return;
+
+    for (const f of files) {
+      const dataUrl = await fileToDataURL(f);
+      pdfModel.addFile(f.name, dataUrl);
+    }
+    renderList();
+    const first = pdfModel.list()[0];
+    if (first) frame.src = first.dataUrl + "#view=FitH";
+    input.value = ""; // reset chooser
+  }, { once:false });
+
+  function renderList() {
+    list.innerHTML = "";
+    const files = pdfModel.list();
+    if (!files.length) {
+      frame.src = "";
+      return;
+    }
+    files.forEach(({ id, name, dataUrl }) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "box";
+      btn.style.cursor = "pointer";
+      btn.textContent = `📄 ${name}`;
+      btn.dataset.url = dataUrl;
+      btn.dataset.id = id;
+      list.appendChild(btn);
+    });
+    // auto-preview first
+    if (!frame.src && files[0]) frame.src = files[0].dataUrl + "#view=FitH";
+  }
+
+  function fileToDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(reader.error);
+      reader.onload = () => resolve(reader.result); // data URL
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+/* ============ APP BOOTSTRAP ============ */
+window.App = (() => {
+  // Models
+  const authModel = new AuthModel();
+  const resultsModel = new ResultsModel();
+  const dashboardModel = new DashboardModel(resultsModel);
+  const pdfModel = new PDFLibraryModel();
+  const quizModel = new QuizModel();
+
+  // Views
+  const quizView = new QuizView();
+  const resultsView = new ResultsView();
+
+  // Controllers
+  const navigation = new NavigationController(authModel);
+  const authController = new AuthController(authModel, navigation);
+  const dashboardController = new DashboardController(dashboardModel);
+  const quizController = new QuizController(quizModel, resultsModel, quizView, resultsView);
+
+  function bindNavLinks() {
+    window.addEventListener("hashchange", () => {
+      navigation.route();
+    });
+  }
+
+  function init() {
+    Sections.allIds.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = "none"; });
+    authController.bindLoginForm();
+    bindNavLinks();
+    navigation.route();
+    quizController.wireRoute();
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+
+  return {
+    pdfModel,
+    dashboardController,
+    quizModel
+  };
+})();
+  </script>
+</body>
+</html>

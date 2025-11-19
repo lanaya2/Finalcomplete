@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>NoteNest – Take Quiz</title>
+  <link rel="stylesheet" href="../../../main/styles.css">
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 1.5rem; }
+    h1 { color: #4f46e5; }
+    .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; background: #fff; max-width: 600px; margin-top: 1rem; }
+    .options { list-style: none; padding: 0; }
+    .options li { margin-bottom: .5rem; }
+    .btn-primary { background: #4f46e5; color: #fff; padding: .4rem .9rem; border-radius: 999px; border: none; cursor: pointer; }
+    .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div>
+      <h1 id="quizTitle">Take Quiz</h1>
+      <p class="muted" id="quizSubtitle"></p>
+    </div>
+    <div>
+      <button id="homeBtn" class="btn">Home</button>
+      <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+  </div>
+
+  <div class="card" id="quizCard">
+    <h2 id="questionText">Loading quiz...</h2>
+    <ul id="optionsList" class="options"></ul>
+    <p id="feedback" class="muted"></p>
+    <button id="nextBtn" class="btn-primary" type="button" disabled>Next</button>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none;">
+    <h2>Quiz Finished</h2>
+    <p id="scoreText"></p>
+    <button id="finishBtn" class="btn-primary" type="button">Back to Home</button>
+  </div>
+
+  <script type="module" src="../../../quiz/quiz_take.js"></script>
+</body>
+</html>
+
+<script type="module">
+
+import { logoutUser } from "../../auth.js";
+
+logoutBtn.addEventListener("click", () => logoutUser());
+
+
+</script>

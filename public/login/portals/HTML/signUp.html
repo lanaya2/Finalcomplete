@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NoteNest – Sign Up</title>
+
+  <link rel="stylesheet" href="../../../main/styles.css">
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; background:#fff; color:#111; }
+    .wrap { max-width: 420px; margin: 4rem auto; padding: 2px; }
+    .center { text-align: center; }
+    .muted { color: #666; font-size: .95rem; }
+    .box { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fff; margin-top: 12px; }
+    .btn { display: inline-block; background: #4f46e5; color:#fff; border-radius: 8px; padding: 8px 14px; text-decoration:none; cursor:pointer; border:none; }
+    .btn.secondary { background:#111827; }
+    input { width: 100%; padding:8px; font-size:1rem; border:1px solid #ddd; border-radius:8px; margin-top:6px; }
+    label { font-weight:bold; }
+    #message { margin-top:10px; color:#b91c1c; }
+    .link-row { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <section id="signup" class="section" style="display:block;">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2>Create an Account</h2>
+      <p class="muted">Sign up with your name, email, and a password.</p>
+
+      <form id="signUpForm" class="box" novalidate>
+
+        <!-- NAME FIELD -->
+        <label for="name"><strong>Full Name</strong></label>
+        <input id="name" name="name" type="text" required placeholder="Your full name" />
+
+        <label for="email"><strong>Email</strong></label>
+        <input id="email" name="email" type="email" required placeholder="your.name@twu.edu" />
+
+        <label for="password" style="margin-top:8px"><strong>Password</strong></label>
+        <input id="password" name="password" type="password" required placeholder="••••••••" />
+
+        <label for="confirmPassword" style="margin-top:8px"><strong>Confirm Password</strong></label>
+        <input id="confirmPassword" name="confirmPassword" type="password" required placeholder="••••••••" />
+
+        <button type="submit" class="btn" style="width:100%;margin-top:10px;">Sign Up</button>
+
+        <div id="message"></div>
+
+        <div class="link-row">
+          <span class="muted">Already have an account?</span>
+          <a href="login.html" class="btn secondary" style="padding:6px 10px;font-size:.9rem;">Back to Login</a>
+        </div>
+
+      </form>
+    </section>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "../../../main/firebase.js";
+    import {createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import {doc, setDoc} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+    const form = document.getElementById("signUpForm");
+    const msg  = document.getElementById("message");
+
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (msg) msg.textContent = "";
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+
+        //Basic validation
+        if (!name || !email || !password || !confirmPassword) {
+          msg.textContent = "Please fill out all fields.";
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          msg.textContent = "Passwords do not match.";
+          return;
+        }
+
+        //Create account in Firebase
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((cred) => {
+            const uid = cred.user.uid;
+
+            //Save user info to Firesbase
+            return setDoc(doc(db, "users", uid), {
+              name,
+              email,
+              role: "student",
+              createdAt: new Date().toISOString()
+            });
+          })
+          .then(() => {
+            // Firebase logs the user in automatically
+            window.location.href = "/public/login/portals/HTML/student_homepage.html";
+          })
+          .catch((err) => {
+            console.error("Sign up error:", err);
+            msg.textContent = err.message || "Sign up failed.";
+          });
+      });
+    }
+  </script>
+
+</body>
+</html>
