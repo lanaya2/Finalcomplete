@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>NoteNest – Quiz Builder</title>
+  <link rel="stylesheet" href="../../../main/styles.css">
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 1.5rem; }
+    h1 { color: #4f46e5; }
+    .row { display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; }
+    .card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; background: #fff; max-width: 500px; flex: 1; }
+    label { display: block; font-weight: 600; margin-top: .5rem; }
+    input, textarea, select { width: 100%; padding: .4rem; border-radius: 8px; border: 1px solid #d1d5db; margin-top: .25rem; }
+    button { margin-top: .75rem; padding: .4rem .9rem; border-radius: 999px; border: none; cursor: pointer; }
+    .btn-primary { background: #4f46e5; color: #fff; }
+    .btn-secondary { background: #111827; color: #fff; }
+    ol { padding-left: 1.3rem; }
+    li { margin-bottom: .3rem; }
+    .muted { color: #6b7280; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <h1>📘 NoteNest – Quiz Builder</h1>
+  <p class="muted">Create a quiz by adding questions below. Each question can have multiple options and one correct answer.</p>
+
+  <div class="row">
+
+    <!-- Quiz creation form -->
+    <div class="card">
+      <h2>Create Quiz</h2>
+      <label for="quizName">Quiz Name</label>
+      <input id="quizName" type="text" placeholder="e.g. Chapter 3 – Derivatives">
+
+      <label for="questionText">Question</label>
+      <textarea id="questionText" rows="2" placeholder="Enter the question text"></textarea>
+
+      <label>Options (one per line)</label>
+      <textarea id="optionsText" rows="3" placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"></textarea>
+
+      <label for="correctIndex">Correct Option Index (starting at 0)</label>
+      <input id="correctIndex" type="number" min="0" value="0">
+
+      <button id="addQuestionBtn" class="btn-secondary" type="button">Add Question</button>
+      <button id="saveQuizBtn" class="btn-primary" type="button">Save Quiz</button>
+
+      <div id="builderMessage" class="muted" style="margin-top:.5rem;"></div>
+    </div>
+
+    <!-- Live preview of questions added -->
+    <div class="card">
+      <h2>Questions Preview</h2>
+      <ol id="questionsPreview"></ol>
+    </div>
+  </div>
+
+  <button id="logoutBtn" class="btn">Logout</button>
+
+  <!-- Very simple quiz start area (for testing) -->
+  <div class="card" style="margin-top:1.5rem; max-width:500px;">
+    <h2>Start Quiz (Test)</h2>
+    <label for="startQuizName">Quiz Name</label>
+    <input id="startQuizName" type="text" placeholder="Exact quiz name">
+    <button id="startQuizBtn" class="btn-primary" type="button">Start Quiz (console only)</button>
+    <p class="muted">For now this just logs questions and scoring in the console. You can hook it up to the UI later.</p>
+  </div>
+
+  <script type="module" src="../../../quiz/quiz_home_page.js"></script>
+</body>
+</html>
+
+<script type='module'>
+
+  import { logoutUser } from "../../auth.js";
+  import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+
+    onAuthStateChanged(auth, (user) => {
+    if (user) {
+      userId = user.uid;
+      console.log("User ID stored:", userId);
+    } else {
+      console.log("User not logged in. Redirecting to login page.");
+      logoutUser();
+    }
+  });
+  
+  document.getElementById("logoutBtn").addEventListener("click", () => logoutUser());
