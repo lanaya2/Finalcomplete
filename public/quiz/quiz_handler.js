@@ -6,7 +6,9 @@ const Quiz = (() => {
   let currentQuiz = null;  // current quiz data
   let currentIndex = 0;    // question index
   let score = 0;           // user score
-  let userId = "";         // current user's UID
+  let userId = null;       // current user's UID
+
+  
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -18,7 +20,6 @@ const Quiz = (() => {
     }
   });
 
-  // Promise is essentially awaiting the information from firebase, then executing code based off the recieved input
   function createQuiz(name, questions) {
     if (!userId) {
       return Promise.reject(
@@ -48,13 +49,13 @@ const Quiz = (() => {
       });
   }
 
-  // 3) Load a quiz from Firestore
+
   function loadQuiz(name) {
     if (!name) {
       return Promise.reject(new Error("Quiz name is required."));
     }
 
-    const userName = name.trim();//same as last if statement
+    const userName = name.trim();
     const quizRef = doc(db, "quizzes", userName);
 
     return getDoc(quizRef)
@@ -73,10 +74,8 @@ const Quiz = (() => {
       });
   }
 
-  // 4) Load user progress (currentIndex & score)
   function loadUserProgress(quizName) {
     if (!userId) {
-      // If user not set yet, just resolve immediately
       return Promise.resolve();
     }
 
@@ -100,8 +99,6 @@ const Quiz = (() => {
     return setDoc(progressRef, {
       currentIndex: 0,
       score: 0,
-    }).then(() => {
-      console.log("User progress initialized.");
     });
   }
 
@@ -127,14 +124,12 @@ const Quiz = (() => {
     });
   }
 
-  // 5) Start a quiz (load + show first question)
   function startQuiz(name) {
     return loadQuiz(name).then(() => {
       showQuestion();
     });
   }
 
-  // 6) Show current question (hook up to DOM later)
   function showQuestion() {
     if (!currentQuiz) {
       console.error("No quiz loaded.");

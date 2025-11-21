@@ -33,15 +33,7 @@
     <p id="status" class="muted"></p>
   </div>
 
+  <script type="module" src="../../auth.js"></script>
   <script type="module" src="../../../quiz/quiz_list.js"></script>
 </body>
 </html>
-
-  <!-- LOGOUT LOGIC -->
-  <script type="module">
-    
-import { logoutUser } from "../../auth.js";
-
-logoutBtn.addEventListener("click", () => logoutUser());
-
-  </script>

@@ -25,30 +25,25 @@
   <h1>📘 NoteNest</h1>
   <p class="muted">Choose an option below to get started.</p>
 
-  <!-- MAIN NAVIGATION GRID -->
   <div class="home-grid">
 
-    <!-- CREATE QUIZ -->
     <a href="quiz_creator.html" class="card btn center" style="display:block;">
       <h2>Create Quiz</h2>
     </a>
 
-    <!-- TAKE QUIZ -->
     <a href="quiz_list.html" class="card btn center" style="display:block;">
       <h2>Take Quiz</h2>
     </a>
 
-    <!-- UPLOAD MATERIALS -->
-    <a href="/materials/upload.html" class="card btn center" style="display:block;">
+    <a href="upload.html" class="card btn center" style="display:block;">
       <h2>Upload Study Materials</h2>
     </a>
 
-    <!-- STUDY MATERIAL LIST -->
-    <a href="/materials/list.html" class="card btn center" style="display:block;">
+    <a href="pdf_view.html" class="card btn center" style="display:block;">
       <h2>Study Materials</h2>
     </a>
 
-    <!-- LOGOUT -->
+
     <button id="logoutBtn" class="card btn center" style="display:block;">
       <h2>Logout</h2>
     </button>
@@ -56,17 +51,34 @@
   </div>
 
 
-  <!-- LOGOUT LOGIC -->
   <script type="module">
+    import { logoutUser } from "../../auth.js";
     import { auth } from "../../../main/firebase.js";
-    import { signOut }
-      from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+
+
+    let userId = null;
+
+        onAuthStateChanged(auth, (user) => {
+    if (user) {
+      userId = user.uid;
+      console.log("User ID stored:", userId);
+    } else {
+      console.log("User not logged in. Redirecting to login page.");
+      logoutUser();
+    }
+  });
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       signOut(auth).then(() => {
         window.location.href = "/public/login/portals/HTML/login.html";
       });
     });
+
+
+
+
   </script>
 
 </body>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NoteNest – Upload Study Materials</title>
+
+  <link rel="stylesheet" href="../../../main/styles.css">
+
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; background:#fff; color:#111; }
+    .wrap { max-width: 420px; margin: 4rem auto; padding: 2px; }
+    .center { text-align: center; }
+    .muted { color: #666; font-size: .95rem; }
+    .box { border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fff; margin-top: 12px; }
+    .btn { display: inline-block; background: #4f46e5; color:#fff; border-radius: 8px; padding: 8px 14px; text-decoration:none; cursor:pointer; border:none; }
+    .btn.secondary { background:#111827; }
+    .status-text { margin-top: 8px; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="section">
+      <h1 class="center" style="color:#4f46e5;">📘 NoteNest</h1>
+      <h2>Upload Study Materials</h2>
+      <p class="muted">Upload a PDF to share as study material.</p>
+
+      <form id="uploadForm" class="box" novalidate>
+        <label for="pdfFile"><strong>Choose a PDF</strong></label>
+        <input id="pdfFile" name="pdfFile" type="file" accept="application/pdf" required>
+
+        <button type="submit" class="btn" style="margin-top:10px;width:100%;">Upload PDF</button>
+
+        <div id="uploadStatus" class="status-text muted"></div>
+      </form>
+
+      <p style="margin-top:12px;">
+        <a href="student_homepage.html" class="btn secondary">Back to Home</a>
+      </p>
+    </section>
+  </div>
+
+  <script type="module">
+    import { auth, db, storage } from "../../../main/firebase.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
+    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+    const uploadForm   = document.getElementById("uploadForm");
+    const fileInput    = document.getElementById("pdfFile");
+    const uploadStatus = document.getElementById("uploadStatus");
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      console.log("Auth state in upload page:", user);
+      if (!user) {
+        uploadStatus.style.color = "#b91c1c";
+        uploadStatus.textContent = "You must be logged in to upload materials.";
+      } else {
+        uploadStatus.style.color = "#6b7280";
+        uploadStatus.textContent = "";
+      }
+    });
+
+    function makeId() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+    }
+
+    uploadForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      console.log("Current user at upload time:", currentUser);
+
+      if (!currentUser) {
+        uploadStatus.style.color = "#b91c1c";
+        uploadStatus.textContent = "You must be logged in to upload materials.";
+        return;
+      }
+
+      const file = fileInput.files[0];
+      if (!file) {
+        uploadStatus.style.color = "#b91c1c";
+        uploadStatus.textContent = "Please choose a PDF file.";
+        return;
+      }
+
+      if (file.type !== "application/pdf") {
+        uploadStatus.style.color = "#b91c1c";
+        uploadStatus.textContent = "Only PDF files are allowed.";
+        return;
+      }
+
+      try {
+        uploadStatus.style.color = "#6b7280";
+        uploadStatus.textContent = "Uploading…";
+
+        const filePath   = `materials/${currentUser.uid}/${Date.now()}-${file.name}`;
+        const storageRef = ref(storage, filePath);
+
+        console.log("Uploading to path:", filePath);
+
+        const result = await uploadBytes(storageRef, file);
+        console.log("uploadBytes result:", result);
+
+        const downloadURL = await getDownloadURL(storageRef);
+        console.log("Download URL:", downloadURL);
+
+        const materialId = makeId();
+        await setDoc(doc(db, "materials", materialId), {
+          ownerUid: currentUser.uid,
+          ownerEmail: currentUser.email || null,
+          fileName: file.name,
+          storagePath: filePath,
+          downloadURL,
+          createdAt: serverTimestamp()
+        });
+
+        uploadStatus.style.color = "#16a34a";
+        uploadStatus.textContent = "Upload complete!";
+        fileInput.value = "";
+      } catch (err) {
+        console.error("Upload error object:", err);
+        console.log("Upload error code:", err.code);
+        console.log("Upload error message:", err.message);
+        if (err.serverResponse) {
+          console.log("Raw serverResponse:", err.serverResponse);
+        }
+        uploadStatus.style.color = "#b91c1c";
+        uploadStatus.textContent = err.message || "Upload failed.";
+      }
+    });
+  </script>
+</body>
+</html>

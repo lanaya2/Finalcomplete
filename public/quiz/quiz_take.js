@@ -1,19 +1,7 @@
 import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import { db, auth } from "../main/firebase.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import {doc, getDoc} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 import { logoutUser } from "../login/auth.js";
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      userId = user.uid;
-      console.log("User ID stored:", userId);
-    } else {
-      console.log("User not logged in. Redirecting to login page.");
-      logoutUser();
-    }
-  });
-
 
 const quizTitle    = document.getElementById("quizTitle");
 const quizSubtitle = document.getElementById("quizSubtitle");
@@ -30,6 +18,16 @@ const homeBtn   = document.getElementById("homeBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const finishBtn = document.getElementById("finishBtn");
 
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      userId = user.uid;
+      console.log("User ID stored:", userId);
+    } else {
+      console.log("User not logged in. Redirecting to login page.");
+      logoutUser();
+    }
+  });
 // Navigation buttons
 homeBtn.addEventListener("click", () => {
   window.location.href = "/public/login/portals/HTML/student_homepage.html";

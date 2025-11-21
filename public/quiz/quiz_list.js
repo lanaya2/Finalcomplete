@@ -1,6 +1,5 @@
 import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import { db, auth } from "../main/firebase.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import {collection,getDocs} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 import { logoutUser } from "../login/auth.js";
 
@@ -8,6 +7,8 @@ const quizList = document.getElementById("quizList");
 const status   = document.getElementById("status");
 const homeBtn    = document.getElementById("homeBtn");
 const logoutBtn  = document.getElementById("logoutBtn");
+
+let userId = null;
 
   onAuthStateChanged(auth, (user) => {
     if (user) {

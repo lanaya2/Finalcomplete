@@ -17,6 +17,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 const builderQuestions = [];
 
+let userId = null;
 
   onAuthStateChanged(auth, (user) => {
     if (user) {

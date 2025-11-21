@@ -17,7 +17,7 @@ function fetchUserRole(uid) {
 }
 
 //Redirect
-function redirectByRole(role) {
+async function redirectByRole(role) {
   if (role === "admin" || role === "teacher") {
     window.location.href = "admin.html";
   } else {
@@ -25,7 +25,7 @@ function redirectByRole(role) {
   }
 }
 
-//Auto-redirect (ONLY matters on login.html)
+//Auto-redirect to HOMEPAGE
 onAuthStateChanged(auth, (user) => {
   if (!user || !form) return; // not on login page, or not logged in
   fetchUserRole(user.uid)
@@ -70,7 +70,6 @@ export function logoutUser() {
     .then(() => {
       console.log("User logged out.");
       localStorage.removeItem("notenest.auth");
-      //should redirect to public/login/login.html due to autoredirect logic written in 'redirectByRole()'
       window.location.href = "/public/login/portals/HTML/login.html";
     })
     .catch((err) => {

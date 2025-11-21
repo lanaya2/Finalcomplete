@@ -6,7 +6,7 @@ const userDisplay = document.getElementById("userDisplay");
 const logoutBtn   = document.getElementById("logoutBtn");
 
 function redirectToLogin() {
-  window.location.href = "/public/login/portals/HTML/login.html";
+  window.location.href = "login.html";
 }
 
 function redirectToStudentPortal() {
