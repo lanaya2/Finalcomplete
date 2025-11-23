@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NoteNest – Inbox</title>
+  <link rel="stylesheet" href="../../../main/styles.css">
+  <style>
+    body { padding: 2rem; }
+    h1 { margin-bottom: .5rem; }
+    .layout { display:grid; grid-template-columns: 2fr 1fr; gap:1.5rem; margin-top:1rem; }
+    .message-list { max-height: 400px; overflow-y:auto; }
+    .message { border-bottom:1px solid #e5e7eb; padding:.5rem 0; }
+    .message:last-child { border-bottom:none; }
+    .from { font-weight:bold; }
+    .subject { font-weight:600; }
+    textarea { width:100%; }
+  </style>
+</head>
+<body>
+  <div class="top-bar" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <h1>📥 Inbox</h1>
+      <p class="muted">View and send messages.</p>
+    </div>
+    <div>
+      <button id="homeBtn" class="btn">Home</button>
+      <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- Inbox list -->
+    <div class="card message-list">
+      <h2>Messages to You</h2>
+      <div id="messages"></div>
+      <p id="inboxStatus" class="muted"></p>
+    </div>
+
+    <!-- Send message -->
+    <div class="card">
+      <h2>Send Message</h2>
+      <form id="messageForm">
+        <label for="toEmail">To (email)</label>
+        <input id="toEmail" type="email" class="input" placeholder="student@twu.edu" />
+
+        <label for="subject">Subject</label>
+        <input id="subject" type="text" class="input" />
+
+        <label for="body">Message</label>
+        <textarea id="body" rows="4" class="textarea"></textarea>
+
+        <button type="submit" class="btn">Send</button>
+        <p id="messageStatus" class="muted"></p>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../../../inbox/inbox.js"></script>
+</body>
+</html>

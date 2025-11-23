@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NoteNest – Student Scores</title>
+  <link rel="stylesheet" href="../../../main/styles.css">
+  <style>
+    body { padding: 2rem; }
+    h1 { margin-bottom: .5rem; }
+    table { width:100%; border-collapse: collapse; margin-top:1rem; }
+    th, td { border:1px solid #e5e7eb; padding: .4rem .6rem; text-align:left; }
+    th { background:#f3f4f6; }
+    .top-bar { display:flex; justify-content:space-between; align-items:center; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div>
+      <h1>📊 Student Scores</h1>
+      <p class="muted">Latest quiz attempts.</p>
+    </div>
+    <div>
+      <button id="homeBtn" class="btn">Home</button>
+      <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem;">
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Quiz</th>
+          <th>Score</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="scoresBody"></tbody>
+    </table>
+    <p id="status" class="muted"></p>
+  </div>
+
+  <script type="module" src="../../../quiz/teacher_scores.js"></script>
+</body>
+</html>

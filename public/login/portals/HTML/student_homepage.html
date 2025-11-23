@@ -52,15 +52,13 @@
 
 
   <script type="module">
-    import { logoutUser } from "../../auth.js";
-    import { auth } from "../../../main/firebase.js";
-    import { signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-    import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+  import { auth } from "../../../main/firebase.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+  import { logoutUser } from "../../auth.js";
 
+  let userId = null;
 
-    let userId = null;
-
-        onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, (user) => {
     if (user) {
       userId = user.uid;
       console.log("User ID stored:", userId);
@@ -70,16 +68,14 @@
     }
   });
 
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      signOut(auth).then(() => {
-        window.location.href = "/public/login/portals/HTML/login.html";
-      });
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      logoutUser();
     });
+  }
+</script>
 
-
-
-
-  </script>
 
 </body>
 </html>

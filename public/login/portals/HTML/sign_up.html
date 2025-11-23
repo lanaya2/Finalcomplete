@@ -64,7 +64,7 @@
       <form id="signUpForm" class="box" novalidate>
 
         <label for="name"><strong>First Name</strong></label>
-        <input id="name" name="name" type="text" required placeholder="Your full name" />
+        <input id="name" name="name" type="text" required placeholder="Your first name" />
 
         <label for="email"><strong>Email</strong></label>
         <input id="email" name="email" type="email" required placeholder="your.name@twu.edu" />
@@ -119,13 +119,13 @@
     //hides popup on startup
     roleModalBackdrop.style.display = "none";
 
-    let pendingUserData = null; //needed to remember if user has interacted with pickup or not
+    let pendingUserData = null; //needed to remember if user has interacted with popup or not
 
-    function showRoleModal() {
+    function showRoleModel() {
       roleModalBackdrop.style.display = "flex";
     }
 
-    function hideRoleModal() {
+    function hideRoleModel() {
       roleModalBackdrop.style.display = "none";
     }
 
@@ -148,7 +148,7 @@
           createdAt: new Date().toISOString()
         });
 
-        window.location.href = "/public/login/portals/HTML/student_homepage.html";
+        window.location.href = "/public/login/portals/HTML/login.html";
       } catch (err) {
         console.error("Sign up error:", err);
         msg.style.color = "#b91c1c";
@@ -158,7 +158,6 @@
       }
     }
 
-    // FIRST SUBMIT → VALIDATE → SHOW POPUP
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       msg.textContent = "";
@@ -181,22 +180,22 @@
 
       //if everything passes the checks above, then store the data temporarily to prevent users from creating an account, but not selecting role
       pendingUserData = { name, email, password };
-      showRoleModal();
+      showRoleModel();
     });
 
     // POPUP BUTTONS
     roleStudentBtn.addEventListener("click", () => {
-      hideRoleModal();
+      hideRoleModel();
       registerUserWithRole("student");
     });
 
     roleTeacherBtn.addEventListener("click", () => {
-      hideRoleModal();
+      hideRoleModel();
       registerUserWithRole("teacher");
     });
 
     roleCancelBtn.addEventListener("click", () => {
-      hideRoleModal();
+      hideRoleModel();
       pendingUserData = null;
       msg.textContent = "Signup cancelled. Submit again to restart.";
     });

@@ -38,8 +38,8 @@
       <label>Options (one per line)</label>
       <textarea id="optionsText" rows="3" placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"></textarea>
 
-      <label for="correctIndex">Correct Option Index (starting at 0)</label>
-      <input id="correctIndex" type="number" min="0" value="0">
+      <label for="correctIndex">Correct Option Index (starting at 1)</label>
+      <input id="correctIndex" type="number" min="1" value="1">
 
       <button id="addQuestionBtn" class="btn-secondary" type="button">Add Question</button>
       <button id="saveQuizBtn" class="btn-primary" type="button">Save Quiz</button>
@@ -53,25 +53,16 @@
       <ol id="questionsPreview"></ol>
     </div>
   </div>
-
+  <button id="homeBtn" class="btn">Back To Home</button>
   <button id="logoutBtn" class="btn">Logout</button>
-
-  <!-- Very simple quiz start area (for testing) -->
-  <div class="card" style="margin-top:1.5rem; max-width:500px;">
-    <h2>Start Quiz (Test)</h2>
-    <label for="startQuizName">Quiz Name</label>
-    <input id="startQuizName" type="text" placeholder="Exact quiz name">
-    <button id="startQuizBtn" class="btn-primary" type="button">Start Quiz (console only)</button>
-    <p class="muted">For now this just logs questions and scoring in the console. You can hook it up to the UI later.</p>
-  </div>
-
+  <div>
   <script type="module" src="../../../quiz/quiz_home_page.js"></script>
 </body>
 </html>
 
 <script type='module'>
 
-  import { logoutUser } from "../../auth.js";
+  import { logoutUser, redirectToUserHome } from "../login/auth.js";
   import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
     onAuthStateChanged(auth, (user) => {
@@ -85,3 +76,4 @@
   });
   
   document.getElementById("logoutBtn").addEventListener("click", () => logoutUser());
+  document.getElementById("homeBtn").addEventListener("click", () => redirectToUserHome());

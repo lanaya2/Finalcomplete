@@ -1,25 +1,24 @@
-import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import { db, auth } from "../main/firebase.js";
-import {collection,getDocs} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-import { logoutUser } from "../login/auth.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import { logoutUser, redirectToUserHome } from "../login/auth.js";
 
-const quizList = document.getElementById("quizList");
-const status   = document.getElementById("status");
-const homeBtn    = document.getElementById("homeBtn");
-const logoutBtn  = document.getElementById("logoutBtn");
+const quizList  = document.getElementById("quizList");
+const status    = document.getElementById("status");
+const homeBtn   = document.getElementById("homeBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 
 let userId = null;
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      userId = user.uid;
-      console.log("User ID stored:", userId);
-    } else {
-      console.log("User not logged in. Redirecting to login page.");
-      logoutUser();
-    }
-  });
-
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    userId = user.uid;
+    console.log("User ID stored:", userId);
+  } else {
+    console.log("User not logged in. Redirecting to login page.");
+    logoutUser();
+  }
+});
 
 // Load quizzes from Firestore
 status.textContent = "Loading quizzes...";
@@ -36,7 +35,7 @@ getDocs(collection(db, "quizzes"))
       const data = docSnap.data();
       const name = data.name || docSnap.id;
 
-      const li = document.createElement("li");
+      const list = document.createElement("list");
 
       const span = document.createElement("span");
       span.className = "quiz-title";
@@ -45,14 +44,11 @@ getDocs(collection(db, "quizzes"))
       const btn = document.createElement("button");
       btn.className = "btn-primary";
       btn.textContent = "Take Quiz";
-      btn.addEventListener("click", () => {
-        const encoded = encodeURIComponent(name);
-        window.location.href = `take_quiz.html?name=${encoded}`;
-      });
+      btn.addEventListener("click", () => {window.location.href =("/public/login/portals/HTML/quiz_take.html"); });
 
-      li.appendChild(span);
-      li.appendChild(btn);
-      quizList.appendChild(li);
+      list.appendChild(span);
+      list.appendChild(btn);
+      quizList.appendChild(list);
     });
   })
   .catch((err) => {
@@ -60,11 +56,15 @@ getDocs(collection(db, "quizzes"))
     status.textContent = "Failed to load quizzes.";
   });
 
-  //Home Button
-homeBtn.addEventListener("click", () => {
-  window.location.href = "/public/login/portals/HTML/student_homepage.html";
-});
+//(role aware)
+if (homeBtn) {
+  homeBtn.addEventListener("click", () => {
+    redirectToUserHome();
+  });
+}
 
-logoutBtn.addEventListener("click", () => {
-  logoutUser();
-});
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    logoutUser();
+  });
+}

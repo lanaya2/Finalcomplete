@@ -1,14 +1,14 @@
-import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import { db, auth } from "../main/firebase.js";
-import {doc, getDoc} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-import { logoutUser } from "../login/auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import { logoutUser, redirectToUserHome } from "../login/auth.js";
 
 const quizTitle    = document.getElementById("quizTitle");
 const quizSubtitle = document.getElementById("quizSubtitle");
 const questionText = document.getElementById("questionText");
 const optionsList  = document.getElementById("optionsList");
 const feedback     = document.getElementById("feedback");
-const nextBtn        = document.getElementById("nextBtn");
+const nextBtn      = document.getElementById("nextBtn");
 
 const quizCard   = document.getElementById("quizCard");
 const resultCard = document.getElementById("resultCard");
@@ -18,28 +18,32 @@ const homeBtn   = document.getElementById("homeBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const finishBtn = document.getElementById("finishBtn");
 
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    console.log("User not logged in. Redirecting to login page.");
+    logoutUser();
+  }
+});
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      userId = user.uid;
-      console.log("User ID stored:", userId);
-    } else {
-      console.log("User not logged in. Redirecting to login page.");
-      logoutUser();
-    }
+// r(ole aware)
+if (homeBtn) {
+  homeBtn.addEventListener("click", () => {
+    redirectToUserHome();
   });
-// Navigation buttons
-homeBtn.addEventListener("click", () => {
-  window.location.href = "/public/login/portals/HTML/student_homepage.html";
-});
+}
 
-logoutBtn.addEventListener("click", () => {
-  logoutUser();
-});
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    logoutUser();
+  });
+}
 
-finishBtn.addEventListener("click", () => {
-  window.location.href = "/public/login/portals/HTML/student_homepage.html";
-});
+if (finishBtn) {
+  finishBtn.addEventListener("click", () => {
+    redirectToUserHome();
+  });
+}
+
 
 // get quiz name
 const params = new URLSearchParams(window.location.search);
@@ -50,13 +54,12 @@ let currentIndex = 0;
 let score = 0;
 let selectedIndex = null;
 
-// Load quiz from Firestore
 if (!quizName) {
   questionText.textContent = "No quiz name provided.";
   nextBtn.disabled = true;
 } else {
   quizTitle.textContent = quizName;
-  quizSubtitle.textContent = "Answer each question, then click Next.";
+  quizSubtitle.textContent = "Answer each question and click Next.";
 
   const quizRef = doc(db, "quizzes", quizName);
   getDoc(quizRef)
@@ -81,7 +84,6 @@ if (!quizName) {
     });
 }
 
-// Render current question
 function renderQuestion() {
   selectedIndex = null;
   feedback.textContent = "";
@@ -92,8 +94,7 @@ function renderQuestion() {
 
   optionsList.innerHTML = "";
   q.options.forEach((opt, idx) => {
-    const li = document.createElement("li");
-
+    const list = document.createElement("list");
     const label = document.createElement("label");
     label.style.cursor = "pointer";
 
@@ -103,18 +104,17 @@ function renderQuestion() {
     input.value = String(idx);
     input.style.marginRight = "6px";
 
-    input.addEventListener("change", () => {
+    input.addEventlistener("change", () => {
       selectedIndex = idx;
       nextBtn.disabled = false;
     });
 
     label.appendChild(input);
     label.appendChild(document.createTextNode(opt));
-    li.appendChild(label);
-    optionsList.appendChild(li);
+    list.appendChild(label);
+    optionslistst.appendChild(list);
   });
 
-  // Update button label
   if (currentIndex === quizData.questions.length - 1) {
     nextBtn.textContent = "Submit Quiz";
   } else {
@@ -133,7 +133,7 @@ nextBtn.addEventListener("click", () => {
     feedback.textContent = `Incorrect. Correct answer was option ${q.correct}.`;
   }
 
-  // Brief delay before moving on
+  //add time bewteen each question
   setTimeout(() => {
     currentIndex++;
     if (currentIndex < quizData.questions.length) {
@@ -149,5 +149,3 @@ function showResults() {
   resultCard.style.display = "block";
   scoreText.textContent = `You scored ${score} out of ${quizData.questions.length}.`;
 }
-
-

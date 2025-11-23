@@ -10,14 +10,14 @@ function redirectToLogin() {
 }
 
 function redirectToStudentPortal() {
-  window.location.href = "student.html";
+  window.location.href = "student_homepage.html";
 }
 
 function redirectToAdminPortal() {
-  window.location.href = "admin.html";
+  window.location.href = "teacher_homepage.html";
 }
 
-//Redirect
+
     if (user) {
       userId = user.uid;
       console.log("User ID stored:", userId);

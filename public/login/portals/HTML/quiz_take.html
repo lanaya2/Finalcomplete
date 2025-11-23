@@ -42,14 +42,3 @@
   <script type="module" src="../../../quiz/quiz_take.js"></script>
 </body>
 </html>
-
-<script type="module">
-
-import { logoutUser } from "../../auth.js";
-import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-
-
-logoutBtn.addEventListener("click", () => logoutUser());
-
-
-</script>

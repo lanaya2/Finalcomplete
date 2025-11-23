@@ -1,45 +1,69 @@
-import { auth, db } from "../main/firebase.js";
-import {signInWithEmailAndPassword, onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import {auth, db } from "../main/firebase.js";
+import {signInWithEmailAndPassword, onAuthStateChanged, signOut,} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import {doc, getDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
 const form = document.getElementById("loginForm");
 const msg  = document.getElementById("message");
 
 
+//fetches user data for any function that calls this script
 function fetchUserRole(uid) {
   return getDoc(doc(db, "users", uid)).then((snap) => {
     if (snap.exists()) {
       const data = snap.data();
-      return data.role || "student"; //returns role or defaults to student on error
+      return data.role || "student";
     }
-    return "student"; // wont run, just required to complete loop
+    return "student";
   });
 }
 
-//Redirect
-async function redirectByRole(role) {
+
+function redirectByRole(role) {
   if (role === "admin" || role === "teacher") {
-    window.location.href = "admin.html";
+    window.location.href = "/public/login/portals/HTML/teacher_homepage.html";
   } else {
-    window.location.href = "student_homepage.html";
+    window.location.href = "/public/login/portals/HTML/student_homepage.html";
   }
 }
 
-//Auto-redirect to HOMEPAGE
-onAuthStateChanged(auth, (user) => {
-  if (!user || !form) return; // not on login page, or not logged in
+//login redirect
+export function redirectToLogin() {
+  window.location.href = "/public/login/portals/HTML/login.html";
+}
+
+//role aware Home redirect
+export function redirectToUserHome() {
+  const user = auth.currentUser;
+
+  if (!user) {
+    redirectToLogin();
+    return;
+  }
+
   fetchUserRole(user.uid)
     .then((role) => {
-      console.log("Already logged in as role:", role);
       redirectByRole(role);
     })
     .catch((err) => {
-      console.error("Auto-redirect role lookup failed:", err);
+      console.error("Error determining user role:", err);
+      redirectToLogin();
     });
-});
+}
 
-//Login
+
 if (form) {
+  // If already logged in, auto-redirect based on role
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      fetchUserRole(user.uid)
+        .then((role) => {
+          redirectByRole(role);
+        })
+        .catch((err) => {
+          console.error("Auto redirect role lookup failed:", err);
+        });
+    }
+  });
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -49,11 +73,7 @@ if (form) {
     const password = document.getElementById("password").value;
 
     signInWithEmailAndPassword(auth, email, password)
-      .then((cred) => {
-        console.log("Signed in as", cred.user.email);
-        const uid = cred.user.uid;
-        return fetchUserRole(uid);
-      })
+      .then((cred) => fetchUserRole(cred.user.uid))
       .then((role) => {
         redirectByRole(role);
       })
@@ -64,13 +84,14 @@ if (form) {
   });
 }
 
-//Logout
+// --- Logout ---
+
 export function logoutUser() {
   return signOut(auth)
     .then(() => {
       console.log("User logged out.");
       localStorage.removeItem("notenest.auth");
-      window.location.href = "/public/login/portals/HTML/login.html";
+      redirectToLogin();
     })
     .catch((err) => {
       console.error("Logout error:", err);

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NoteNest – Teacher Dashboard</title>
+
+  <link rel="stylesheet" href="../../../main/styles.css">
+
+  <style>
+    body { padding: 2rem; }
+    h1 { margin-bottom: .5rem; }
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .center { text-align: center; }
+  </style>
+</head>
+
+<body>
+
+  <h1>📘 NoteNest – Teacher</h1>
+  <p class="muted">Manage quizzes, materials, and student feedback.</p>
+
+  <div class="home-grid">
+
+    <!-- View student scores (to implement) -->
+    <a href="teacher_scores.html" class="card btn center" style="display:block;">
+      <h2>View Student Scores</h2>
+    </a>
+
+    <!-- Quiz creator -->
+    <a href="quiz_creator.html" class="card btn center" style="display:block;">
+      <h2>Quiz Creator</h2>
+    </a>
+
+    <!-- Study materials viewer -->
+    <a href="pdf_view.html" class="card btn center" style="display:block;">
+      <h2>Study Materials</h2>
+    </a>
+
+    <!-- Upload materials -->
+    <a href="upload.html" class="card btn center" style="display:block;">
+      <h2>Upload Study Materials</h2>
+    </a>
+
+    <!-- Inbox -->
+    <a href="inbox.html" class="card btn center" style="display:block;">
+      <h2>Inbox</h2>
+    </a>
+
+    <!-- Logout -->
+    <button id="logoutBtn" class="card btn center" style="display:block;">
+      <h2>Logout</h2>
+    </button>
+
+  </div>
+
+  <script type="module">
+    import { auth, db } from "../../../main/firebase.js";
+    import { onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { doc, getDoc } 
+      from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+    import { logoutUser } from "../../auth.js";
+
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    // Requires teacher/admin role; otherwise send to student homepage
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        logoutUser();
+        return;
+      }
+
+      getDoc(doc(db, "users", user.uid))
+        .then((snap) => {
+          const role = snap.exists() ? (snap.data().role || "student") : "student";
+          if (role !== "teacher" && role !== "admin") {
+            window.location.href = "/public/login/portals/HTML/student_homepage.html";
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load user role", err);
+        });
+    });
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        logoutUser();
+      });
+    }
+  </script>
+
+</body>
+</html>
