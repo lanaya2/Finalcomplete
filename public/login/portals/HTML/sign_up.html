@@ -165,6 +165,10 @@
 
       const name = document.getElementById("name").value.trim();
       const email = document.getElementById("email").value.trim();
+      if (!email.toLowerCase().endsWith("@twu.edu")) {
+        msg.textContent = "Only @twu.edu emails may register.";
+      return;
+      }
       const password = document.getElementById("password").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
 

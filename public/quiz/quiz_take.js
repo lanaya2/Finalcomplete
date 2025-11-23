@@ -1,6 +1,6 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 import { db, auth } from "../main/firebase.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import {doc, getDoc, serverTimestamp} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 import { logoutUser, redirectToUserHome } from "../login/auth.js";
 
 const quizTitle    = document.getElementById("quizTitle");
@@ -25,7 +25,6 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// r(ole aware)
 if (homeBtn) {
   homeBtn.addEventListener("click", () => {
     redirectToUserHome();
@@ -44,24 +43,20 @@ if (finishBtn) {
   });
 }
 
-
-// get quiz name
+//Gathering and verifying quiz data
 const params = new URLSearchParams(window.location.search);
-const quizName = params.get("name");
+const quizId = params.get("id");
 
 let quizData = null;
 let currentIndex = 0;
 let score = 0;
 let selectedIndex = null;
 
-if (!quizName) {
-  questionText.textContent = "No quiz name provided.";
+if (!quizId) {
+  questionText.textContent = "No quiz ID provided.";
   nextBtn.disabled = true;
 } else {
-  quizTitle.textContent = quizName;
-  quizSubtitle.textContent = "Answer each question and click Next.";
-
-  const quizRef = doc(db, "quizzes", quizName);
+  const quizRef = doc(db, "quizzes", quizId);
   getDoc(quizRef)
     .then((snap) => {
       if (!snap.exists()) {
@@ -75,6 +70,10 @@ if (!quizName) {
         nextBtn.disabled = true;
         return;
       }
+
+      const title = quizData.name || "Quiz";
+      quizTitle.textContent = title;
+      quizSubtitle.textContent = "Answer each question, then click Next.";
       renderQuestion();
     })
     .catch((err) => {
@@ -94,7 +93,7 @@ function renderQuestion() {
 
   optionsList.innerHTML = "";
   q.options.forEach((opt, idx) => {
-    const list = document.createElement("list");
+    const li = document.createElement("li");
     const label = document.createElement("label");
     label.style.cursor = "pointer";
 
@@ -104,15 +103,15 @@ function renderQuestion() {
     input.value = String(idx);
     input.style.marginRight = "6px";
 
-    input.addEventlistener("change", () => {
+    input.addEventListener("change", () => {
       selectedIndex = idx;
       nextBtn.disabled = false;
     });
 
     label.appendChild(input);
     label.appendChild(document.createTextNode(opt));
-    list.appendChild(label);
-    optionslistst.appendChild(list);
+    li.appendChild(label);
+    optionsList.appendChild(li);
   });
 
   if (currentIndex === quizData.questions.length - 1) {
@@ -130,10 +129,9 @@ nextBtn.addEventListener("click", () => {
     score++;
     feedback.textContent = "Correct!";
   } else {
-    feedback.textContent = `Incorrect. Correct answer was option ${q.correct}.`;
+    feedback.textContent = `Incorrect. Correct answer was option ${q.correct - 1}.`;
   }
 
-  //add time bewteen each question
   setTimeout(() => {
     currentIndex++;
     if (currentIndex < quizData.questions.length) {
@@ -141,11 +139,34 @@ nextBtn.addEventListener("click", () => {
     } else {
       showResults();
     }
-  }, 500);
+  }, 1000);
 });
 
 function showResults() {
   quizCard.style.display = "none";
   resultCard.style.display = "block";
-  scoreText.textContent = `You scored ${score} out of ${quizData.questions.length}.`;
+  scoreText.textContent =
+    `You scored ${score} out of ${quizData.questions.length}.`;
+
+  const user = auth.currentUser;
+  if (user) {
+  const resultId = `${user.uid}_${quizId}`; //Only stores most recent attempt on quiz
+
+  setDoc( //using the index section of firebase as a table similar to SQL
+    doc(db, "quizResults", resultId),
+    {
+      userId: user.uid,
+      userEmail: user.email || null,
+      quizId,
+      quizName: quizData.name || null,
+      score,
+      total: quizData.questions.length,
+      updatedAt: serverTimestamp(), //When the test was last scored
+    },
+    { merge: true } //combines old + new data
+  ).catch((err) => {
+    console.error("Failed to save quiz result:", err);
+  });
+}
+
 }

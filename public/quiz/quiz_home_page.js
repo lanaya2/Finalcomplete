@@ -1,8 +1,7 @@
-import { onAuthStateChanged } 
-  from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-import { auth } from "../main/firebase.js";
-import { logoutUser, redirectToUserHome } from "../login/auth.js";
-import "./quiz_handler.js"; // defines window.Quiz
+import {onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import {auth } from "../main/firebase.js";
+import {logoutUser, redirectToUserHome } from "../login/auth.js";
+import "./quiz_handler.js";
 
 const quizNameInput      = document.getElementById("quizName");
 const questionTextInput  = document.getElementById("questionText");
@@ -35,23 +34,22 @@ if (logoutBtn) {
     logoutUser();
   });
 }
+
 if (homeBtn) {
   homeBtn.addEventListener("click", () => {
     redirectToUserHome();
   });
 }
 
-//Quiz builder preview
 function renderPreview() {
   questionsPreview.innerHTML = "";
   builderQuestions.forEach((q, index) => {
     const li = document.createElement("li");
-    li.textContent = `${q.question} (correct: option ${q.correct})`;
+    li.textContent = `${q.question} (correct: option ${q.correct + 1})`;
     questionsPreview.appendChild(li);
   });
 }
 
-//Add question
 addQuestionBtn.addEventListener("click", () => {
   const question = questionTextInput.value.trim();
   const optionsLines = optionsTextInput.value
@@ -59,7 +57,7 @@ addQuestionBtn.addEventListener("click", () => {
     .map((o) => o.trim())
     .filter((o) => o.length > 0);
 
-  const correctIndex = parseInt(correctIndexInput.value, 10);
+  const correctIndex = parseInt(correctIndexInput.value, 10) - 1;
 
   if (!question) {
     builderMessage.textContent = "Please enter a question.";
@@ -70,12 +68,9 @@ addQuestionBtn.addEventListener("click", () => {
     return;
   }
   if (
-    Number.isNaN(correctIndex) ||
-    correctIndex < 0 ||
-    correctIndex >= optionsLines.length
-  ) {
+    Number.isNaN(correctIndex) || correctIndex < 0 || correctIndex >= optionsLines.length) {
     builderMessage.textContent =
-      `Correct option index must be between 0 and ${optionsLines.length - 1}.`;
+      `Correct option index must be between 1 and ${optionsLines.length}.`;
     return;
   }
 
@@ -87,13 +82,13 @@ addQuestionBtn.addEventListener("click", () => {
 
   questionTextInput.value = "";
   optionsTextInput.value = "";
-  correctIndexInput.value = 0;
+  correctIndexInput.value = 1;
   builderMessage.textContent = `Added question #${builderQuestions.length}.`;
 
   renderPreview();
 });
 
-//Save quiz to Firestore using window.Quiz
+// quiz (uses unique ID)
 saveQuizBtn.addEventListener("click", () => {
   const name = quizNameInput.value.trim();
   if (!name) {
@@ -107,7 +102,8 @@ saveQuizBtn.addEventListener("click", () => {
 
   builderMessage.textContent = "Saving quiz...";
 
-  window.Quiz.createQuiz(name, builderQuestions)
+
+  window.Quiz.createQuiz(name, builderQuestions, userId)
     .then(() => {
       builderMessage.textContent = `Quiz "${name}" saved successfully.`;
     })
@@ -117,17 +113,17 @@ saveQuizBtn.addEventListener("click", () => {
     });
 });
 
-// console test (DEVTOOL)
+// ---- Start quiz  ----
 startQuizBtn.addEventListener("click", () => {
   const name = startQuizNameInput.value.trim();
   if (!name) {
     return;
   }
 
-  console.log("Starting quiz:", name);
+  console.log("Starting quiz (console test):", name);
   window.Quiz.startQuiz(name)
     .then(() => {
-      console.log("Quiz started and ran (see console for questions).");
+      console.log("Quiz ran in console (for testing).");
     })
     .catch((err) => {
       console.error("Failed to start quiz:", err);

@@ -84,3 +84,21 @@ input[type="email"],
      grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); 
      gap:16px}
 .center{text-align:center}
+/*Buttons */
+.btn-primary {
+  background: #4f46e5;
+  color: #fff;
+  padding: .4rem .9rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn {
+  background: #4f46e5;
+  color: #fff;
+  padding: .4rem .9rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+}

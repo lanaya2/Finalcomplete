@@ -1,199 +1,50 @@
-import {onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-import { auth, db } from "../main/firebase.js";
-import {doc, setDoc, getDoc} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-import { logoutUser } from "../login/auth.js";
-const Quiz = (() => {
-  let currentQuiz = null;  // current quiz data
-  let currentIndex = 0;    // question index
-  let score = 0;           // user score
-  let userId = null;       // current user's UID
+// public/quiz/quiz_handler.js
+import { db } from "../main/firebase.js";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
-  
+// Expose quiz helpers globally
+window.Quiz = {
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      userId = user.uid;
-      console.log("User ID stored:", userId);
-    } else {
-      console.log("User not logged in. Redirecting to login page.");
-      logoutUser();
-    }
-  });
-
-  function createQuiz(name, questions) {
-    if (!userId) {
-      return Promise.reject(
-        new Error("Cannot create quiz: user not logged in yet.")
-      );
-    }
-    if (!name) {
-      return Promise.reject(new Error("Quiz name is required."));
-    }
-    if (!questions || questions.length == 0) {
-      return Promise.reject(new Error("You must add at least one question."));
-    }
-
-    const userName = name.trim(); //trim is used to remove any extra spaces entered
-    const quizRef = doc(db, "quizzes", userName);
-
-    const quizData = {
-      name: userName,
+  createQuiz(name, questions, ownerUid = null) {
+    return addDoc(collection(db, "quizzes"), {
+      name,
       questions,
-      created: new Date().toISOString(),
-      createdBy: userId,
-    };
-
-    return setDoc(quizRef, quizData)
-      .then(() => {
-        console.log(`Quiz "${userName}" created and saved to Firebase.`);
-      });
-  }
-
-
-  function loadQuiz(name) {
-    if (!name) {
-      return Promise.reject(new Error("Quiz name is required."));
-    }
-
-    const userName = name.trim();
-    const quizRef = doc(db, "quizzes", userName);
-
-    return getDoc(quizRef)
-      .then((snap) => {
-        if (!snap.exists()) {
-          throw new Error(`Quiz "${userName}" not found in Firebase.`);
-        }
-
-        currentQuiz = snap.data();
-        currentIndex = 0;
-        score = 0;
-
-        console.log(`Loaded quiz: ${userName}`);
-
-        return loadUserProgress(currentQuiz.name);
-      });
-  }
-
-  function loadUserProgress(quizName) {
-    if (!userId) {
-      return Promise.resolve();
-    }
-
-    const progressRef = doc(db, "userProgress", userId, "quizzes", quizName);
-
-    return getDoc(progressRef).then((snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        currentIndex = data.currentIndex || 0;
-        score = data.score || 0;
-        console.log("User progress loaded:", data);
-      } else {
-        console.log("No previous progress, initializing...");
-        return initializeUserProgress(quizName);
-      }
+      owner: ownerUid,
+      createdAt: serverTimestamp(),
     });
-  }
+  },
 
-  function initializeUserProgress(quizName) {
-    const progressRef = doc(db, "userProgress", userId, "quizzes", quizName);
-    return setDoc(progressRef, {
-      currentIndex: 0,
-      score: 0,
-    });
-  }
+  async startQuiz(name) {
+    const q = query(collection(db, "quizzes"), where("name", "==", name)); //firestore logic is weird sometimes, yes the equals should be in quotes
+    const snap = await getDocs(q);
 
-  function saveUserProgress() {
-    if (!userId || !currentQuiz) {
-      return Promise.resolve();
-    }
-
-    const progressRef = doc(
-      db,
-      "userProgress",
-      userId,
-      "quizzes",
-      currentQuiz.name
-    );
-
-    return setDoc(
-      progressRef,
-      { currentIndex, score },
-      { merge: true }
-    ).then(() => {
-      console.log("User progress saved.");
-    });
-  }
-
-  function startQuiz(name) {
-    return loadQuiz(name).then(() => {
-      showQuestion();
-    });
-  }
-
-  function showQuestion() {
-    if (!currentQuiz) {
-      console.error("No quiz loaded.");
+    if (snap.empty) {
+      console.warn(`No quiz found with name "${name}".`);
       return;
     }
 
-    const q = currentQuiz.questions[currentIndex];
-    if (!q) {
-      endQuiz();
-      return;
-    }
+    const quizDoc = snap.docs[0];
+    const data = quizDoc.data();
+    const questions = data.questions || [];
 
-    console.log(`Question ${currentIndex + 1}: ${q.question}`);
-    console.log("Options:", q.options);
+    console.log(`Starting quiz: ${data.name} (id=${quizDoc.id})`);
+    let score = 0;
 
-    //TODO update the website here instead of console.log.
-  }
-
-  function submitAnswer(answerIndex) {
-    if (!currentQuiz) {
-      console.error("No quiz loaded.");
-      return Promise.reject(new Error("No quiz loaded."));
-    }
-    
-    if (
-      currentIndex < 0 ||
-      currentIndex >= currentQuiz.questions.length
-    ) {
-      console.error("Question index out of range.");
-      return Promise.reject(new Error("Question index out of range."));
-    }
-
-    const q = currentQuiz.questions[currentIndex];
-
-    if (q.correct === answerIndex) {
-      score++;
-      console.log("Correct!");
-    } else {
-      console.log("Incorrect.");
-    }
-
-    currentIndex++;
-
-    return saveUserProgress().then(() => {
-      if (currentIndex < currentQuiz.questions.length) {
-        showQuestion();
-      } else {
-        return endQuiz();
-      }
+    questions.forEach((q, index) => {
+      console.log(`Q${index + 1}: ${q.question}`);
+      q.options.forEach((opt, i) => {
+        console.log(`  [${i}] ${opt}`);
+      });
+      console.log(`  Correct index: ${q.correct}`);
     });
-  }
 
-  function endQuiz() {
-    console.log("Quiz completed!");
-    console.log(`Your score: ${score}/${currentQuiz.questions.length}`);
-    return saveUserProgress();
-  }
-
-  return {
-    createQuiz,
-    startQuiz,
-    submitAnswer,
-  };
-})();
-
-//Exposed globally so other scripts can call it
-window.Quiz = Quiz;
+    console.log("Quiz finished (console test only).");
+  },
+};

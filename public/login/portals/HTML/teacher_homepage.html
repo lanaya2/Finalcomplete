@@ -31,10 +31,17 @@
       <h2>View Student Scores</h2>
     </a>
 
+    <!-- View Quizzes -->
+    <a href="quiz_list.html" class="card btn center" style="display:block;">
+      <h2>View Quizzes</h2>
+    </a>
+
     <!-- Quiz creator -->
     <a href="quiz_creator.html" class="card btn center" style="display:block;">
       <h2>Quiz Creator</h2>
     </a>
+
+
 
     <!-- Study materials viewer -->
     <a href="pdf_view.html" class="card btn center" style="display:block;">
@@ -60,10 +67,8 @@
 
   <script type="module">
     import { auth, db } from "../../../main/firebase.js";
-    import { onAuthStateChanged } 
-      from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-    import { doc, getDoc } 
-      from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
     import { logoutUser } from "../../auth.js";
 
     const logoutBtn = document.getElementById("logoutBtn");

@@ -7,10 +7,17 @@
   <style>
     body { padding: 2rem; }
     h1 { margin-bottom: .5rem; }
-    table { width:100%; border-collapse: collapse; margin-top:1rem; }
+    table { width:100%; border-collapse: collapse; margin-top:.5rem; }
     th, td { border:1px solid #e5e7eb; padding: .4rem .6rem; text-align:left; }
     th { background:#f3f4f6; }
     .top-bar { display:flex; justify-content:space-between; align-items:center; }
+    .search-row { display:flex; justify-content:space-between; align-items:center; gap:.75rem; margin-top:.75rem; }
+    #scoreSearch {
+      flex:1;
+      padding:.35rem .6rem;
+      border-radius:8px;
+      border:1px solid #d1d5db;
+    }
   </style>
 </head>
 <body>
@@ -25,18 +32,26 @@
     </div>
   </div>
 
-  <div class="card" style="margin-top:1rem;">
+  <div class="card" style="margin-top:1rem; padding:1rem;">
+    <div class="search-row">
+      <h2 style="margin:0;">Scores</h2>
+      <input id="scoreSearch" type="text"
+             placeholder="Search by student email or quiz name…">
+    </div>
+
     <table>
-      <thead>
-        <tr>
-          <th>Student</th>
-          <th>Quiz</th>
-          <th>Score</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody id="scoresBody"></tbody>
-    </table>
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Quiz</th>
+      <th>Score</th>
+      <th>Last Taken</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="scoresBody"></tbody>
+</table>
+
     <p id="status" class="muted"></p>
   </div>
 

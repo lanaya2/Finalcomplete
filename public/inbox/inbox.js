@@ -1,8 +1,7 @@
+import {auth, db } from "../main/firebase.js";
 import {onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-import {collection, query, where, getDocs, addDoc, serverTimestamp} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-import { auth, db } from "../main/firebase.js";
-import { logoutUser, redirectToUserHome } from "../login/auth.js";
-
+import {collection, query, where, getDocs, addDoc, serverTimestamp, deleteDoc, doc} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import {logoutUser, redirectToUserHome } from "../login/auth.js";
 
 const messagesDiv   = document.getElementById("messages");
 const inboxStatus   = document.getElementById("inboxStatus");
@@ -38,6 +37,8 @@ if (logoutBtn) {
 }
 
 function loadInbox(user) {
+  if (!messagesDiv || !inboxStatus) return;
+
   inboxStatus.textContent = "Loading messages...";
 
   const q = query(
@@ -48,16 +49,22 @@ function loadInbox(user) {
   getDocs(q)
     .then((snap) => {
       messagesDiv.innerHTML = "";
+
       if (snap.empty) {
         inboxStatus.textContent = "No messages.";
         return;
       }
+
       inboxStatus.textContent = "";
 
       snap.forEach((docSnap) => {
         const data = docSnap.data();
-        const div = document.createElement("div");
-        div.className = "message";
+        const msgId = docSnap.id;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "message";
+        wrapper.style.borderBottom = "1px solid #e5e7eb";
+        wrapper.style.padding = ".5rem 0";
 
         const fromEl = document.createElement("div");
         fromEl.className = "from";
@@ -70,17 +77,47 @@ function loadInbox(user) {
         const bodyEl = document.createElement("div");
         bodyEl.textContent = data.body || "";
 
+        const metaRow = document.createElement("div");
+        metaRow.style.display = "flex";
+        metaRow.style.justifyContent = "space-between";
+        metaRow.style.alignItems = "center";
+        metaRow.style.marginTop = ".25rem";
+
         const dateEl = document.createElement("div");
         dateEl.className = "muted";
         const date = data.createdAt?.toDate ? data.createdAt.toDate() : null;
         dateEl.textContent = date ? date.toLocaleString() : "";
 
-        div.appendChild(fromEl);
-        div.appendChild(subjectEl);
-        div.appendChild(bodyEl);
-        div.appendChild(dateEl);
+        //Delete button (user can delete messages)
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "btn";
+        deleteBtn.style.background = "#b91c1c";
+        deleteBtn.style.color = "#fff";
+        deleteBtn.style.padding = ".2rem .6rem";
+        deleteBtn.textContent = "Delete";
 
-        messagesDiv.appendChild(div);
+        deleteBtn.addEventListener("click", async () => {
+          const ok = confirm("Delete this message?");
+          if (!ok) return;
+
+          try {
+            await deleteDoc(doc(db, "messages", msgId));
+            wrapper.remove();
+          } catch (err) {
+            console.error("Failed to delete message:", err);
+            alert("Failed to delete message.");
+          }
+        });
+
+        metaRow.appendChild(dateEl);
+        metaRow.appendChild(deleteBtn);
+
+        wrapper.appendChild(fromEl);
+        wrapper.appendChild(subjectEl);
+        wrapper.appendChild(bodyEl);
+        wrapper.appendChild(metaRow);
+
+        messagesDiv.appendChild(wrapper);
       });
     })
     .catch((err) => {
@@ -89,7 +126,7 @@ function loadInbox(user) {
     });
 }
 
-// Send message
+// ---- Send message ----
 if (messageForm) {
   messageForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -109,7 +146,7 @@ if (messageForm) {
 
     messageStatus.textContent = "Sending...";
 
-    // Look up recipient user by email
+    // Look up recipient by email
     const usersRef = collection(db, "users");
     const q = query(usersRef, where("email", "==", toEmail));
 
@@ -134,7 +171,7 @@ if (messageForm) {
         });
       })
       .then((res) => {
-        if (!res) return; //means previous step failed
+        if (!res) return; // previous step failed
         messageStatus.textContent = "Message sent!";
         subjectInput.value = "";
         bodyInput.value = "";

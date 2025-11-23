@@ -43,6 +43,10 @@
       <h2>Study Materials</h2>
     </a>
 
+    <!-- Inbox -->
+    <a href="inbox.html" class="card btn center" style="display:block;">
+      <h2>Inbox</h2>
+    </a>
 
     <button id="logoutBtn" class="card btn center" style="display:block;">
       <h2>Logout</h2>
@@ -50,32 +54,87 @@
 
   </div>
 
+  <div class="card" style="margin-top:1rem; max-width:600px;">
+  <h2>My Recent Scores</h2>
+  <ul id="recentScores"></ul>
+  <p id="recentScoresStatus" class="muted"></p>
+</div>
 
-  <script type="module">
-  import { auth } from "../../../main/firebase.js";
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-  import { logoutUser } from "../../auth.js";
+
+ <script type="module">
+
+  import {auth, db } from "../../../main/firebase.js";
+  import {onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+  import {collection, query, where, orderBy, limit, getDocs} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+  import {logoutUser } from "../../auth.js";
 
   let userId = null;
+
+  const logoutBtn          = document.getElementById("logoutBtn");
+  const recentScoresList   = document.getElementById("recentScores");
+  const recentScoresStatus = document.getElementById("recentScoresStatus");
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
       userId = user.uid;
       console.log("User ID stored:", userId);
+      loadRecentScores(userId);
     } else {
       console.log("User not logged in. Redirecting to login page.");
       logoutUser();
     }
   });
 
-  const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       logoutUser();
     });
   }
+
+  function loadRecentScores(uid) {
+    if (!recentScoresList || !recentScoresStatus) return;
+
+    recentScoresStatus.textContent = "Loading your scores...";
+
+    const q = query(
+      collection(db, "quizResults"),
+      where("userId", "==", uid),
+      orderBy("createdAt", "desc"),
+      limit(10)  // show last 10 attempts
+    );
+
+    getDocs(q)
+      .then((snap) => {
+        recentScoresList.innerHTML = "";
+
+        if (snap.empty) {
+          recentScoresStatus.textContent = "Your recent quizzes will appear here.";
+          return;
+        }
+
+        recentScoresStatus.textContent = "";
+
+        snap.forEach((docSnap) => {
+          const data = docSnap.data();
+          const li = document.createElement("li");
+
+          const quizName = data.quizName || "(unnamed quiz)";
+          const score    = data.score ?? "?";
+          const total    = data.total ?? "?";
+
+          let dateText = "";
+          if (data.createdAt?.toDate) {
+            const d = data.createdAt.toDate();
+            dateText = " – " + d.toLocaleString();
+          }
+
+          li.textContent = `${quizName}: ${score}/${total}${dateText}`;
+          recentScoresList.appendChild(li);
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to load recent scores:", err);
+        recentScoresStatus.textContent = "Failed to load your scores.";
+      });
+  }
 </script>
-
-
-</body>
-</html>
